@@ -168,23 +168,20 @@ def thread_function():
                 print(side)
                 print('Прошло!')
                 sl = orders[msg['data'][0]['order_link_id']]
+                a = session_unauth.query_symbol()['result']
+
+                for v in a:
+                    if v['name'] == symbol:
+                        ocr = v['price_scale']
                 print(sl)
                 try:
                     print(session_auth.set_trading_stop(
                         symbol=sl[0],
                         side=side,
-                        stop_loss=sl[1]
+                        stop_loss=round(sl[1], ocr)
                     ))
                 except Exception:
-                    try:
-                        c = len(str(sl[1]).split('.')[1]) - 1
-                        print(session_auth_3.set_trading_stop(
-                            symbol=sl[0],
-                            side=side,
-                            stop_loss=round(sl[1], c)
-                        ))
-                    except Exception:
-                        pass
+                    pass
                 for a in cancel_orders[sl[0]]:
                     print(session_auth.cancel_active_order(
                         symbol=sl[0],
@@ -208,24 +205,21 @@ def thread_function2():
             if msg['data'][0]['side'] != side:
                 print(side)
                 print('Прошло!')
+                a = session_unauth.query_symbol()['result']
+
+                for v in a:
+                    if v['name'] == symbol:
+                        ocr = v['price_scale']
                 sl_i = ignat_orders[msg['data'][0]['order_link_id']]
                 print(sl_i)
                 try:
                     print(session_auth_2.set_trading_stop(
                         symbol=sl_i[0],
                         side=side,
-                        stop_loss=sl_i[1]
+                        stop_loss=round(sl_i[1], ocr)
                     ))
                 except Exception:
-                    try:
-                        c = len(str(sl_i[1]).split('.')[1]) - 1
-                        print(session_auth_3.set_trading_stop(
-                            symbol=sl_i[0],
-                            side=side,
-                            stop_loss=round(sl_i[1], c)
-                        ))
-                    except Exception:
-                        pass
+                    pass
                 for g in cancel_orders[sl_i[0] + 'ignat']:
                     print(session_auth_2.cancel_active_order(
                         symbol=sl_i[0],
@@ -249,24 +243,21 @@ def thread_function3():
             if msg['data'][0]['side'] != side:
                 print(side)
                 print('Прошло!')
+                a = session_unauth.query_symbol()['result']
+
+                for v in a:
+                    if v['name'] == symbol:
+                        ocr = v['price_scale']
                 sl_i = maks_orders[msg['data'][0]['order_link_id']]
                 print(sl_i)
                 try:
                     print(session_auth_3.set_trading_stop(
                         symbol=sl_i[0],
                         side=side,
-                        stop_loss=sl_i[1]
+                        stop_loss=round(sl_i[1], ocr)
                     ))
                 except Exception:
-                    try:
-                        c = len(str(sl_i[1]).split('.')[1]) - 1
-                        print(session_auth_3.set_trading_stop(
-                            symbol=sl_i[0],
-                            side=side,
-                            stop_loss=round(sl_i[1], c)
-                        ))
-                    except Exception:
-                        pass
+                    pass
                 for g in cancel_orders[sl_i[0] + 'maks']:
                     print(session_auth_3.cancel_active_order(
                         symbol=sl_i[0],
@@ -291,6 +282,12 @@ i.start()
 b.start()
 
 def order_andrey(symbol, side, qty_m, qty_2, qty_3, count_l, stop_loss, st_one, st_two, tk3):
+    a = session_unauth.query_symbol()['result']
+
+    for v in a:
+        if v['name'] == symbol:
+            ocr = v['price_scale']
+
     limit_link_id1 = generate_random_string(8)
     limit_link_id2 = generate_random_string(8)
     print(session_auth.place_active_order(
@@ -298,8 +295,8 @@ def order_andrey(symbol, side, qty_m, qty_2, qty_3, count_l, stop_loss, st_one, 
         side=side,
         order_type="Market",
         qty=round(float(qty_m), 3),
-        stop_loss=stop_loss,
-        take_profit=tk3,
+        stop_loss=round(stop_loss, ocr),
+        take_profit=round(tk3, ocr),
         time_in_force="GoodTillCancel",
         reduce_only=False,
         close_on_trigger=False
@@ -309,10 +306,10 @@ def order_andrey(symbol, side, qty_m, qty_2, qty_3, count_l, stop_loss, st_one, 
         symbol=symbol,
         side=side,
         order_type="Limit",
-        price=st_one,
+        price=round(st_one, ocr),
         qty=round(float(qty_2), 3),
-        stop_loss=stop_loss,
-        take_profit=tk3,
+        stop_loss=round(stop_loss, ocr),
+        take_profit=round(tk3, ocr),
         order_link_id=limit_link_id1,
         time_in_force="GoodTillCancel",
         reduce_only=False,
@@ -323,10 +320,10 @@ def order_andrey(symbol, side, qty_m, qty_2, qty_3, count_l, stop_loss, st_one, 
         symbol=symbol,
         side=side,
         order_type="Limit",
-        price=st_two,
+        price=round(st_two, ocr),
         qty=round(float(qty_3), 3),
-        stop_loss=stop_loss,
-        take_profit=tk3,
+        stop_loss=round(stop_loss, ocr),
+        take_profit=round(tk3, ocr),
         order_link_id=limit_link_id2,
         time_in_force="GoodTillCancel",
         reduce_only=False,
@@ -335,6 +332,13 @@ def order_andrey(symbol, side, qty_m, qty_2, qty_3, count_l, stop_loss, st_one, 
     cancel_orders[symbol] = [limit_link_id1, limit_link_id2]
 
 def order_ignat_1(symbol, side, stop_loss, count_l, qty_m_ignat, qty_2_ignat, qty_3_ignat, st_one,  st_two, tk3):
+
+    a = session_unauth.query_symbol()['result']
+
+    for v in a:
+        if v['name'] == symbol:
+            ocr = v['price_scale']
+
     limit_link_id1_ignat = generate_random_string(8)
     limit_link_id2_ignat = generate_random_string(8)
     #position_idx=2,
@@ -343,8 +347,8 @@ def order_ignat_1(symbol, side, stop_loss, count_l, qty_m_ignat, qty_2_ignat, qt
         side=side,
         order_type="Market",
         qty=round(qty_m_ignat, 3),
-        stop_loss=stop_loss,
-        take_profit=tk3,
+        stop_loss=round(stop_loss, ocr),
+        take_profit=round(tk3, ocr),
         time_in_force="GoodTillCancel",
         reduce_only=False,
         close_on_trigger=False
@@ -354,10 +358,10 @@ def order_ignat_1(symbol, side, stop_loss, count_l, qty_m_ignat, qty_2_ignat, qt
         symbol=symbol,
         side=side,
         order_type="Limit",
-        price=st_one,
+        price=round(st_one, ocr),
         qty=round(qty_2_ignat, 3),
-        stop_loss=stop_loss,
-        take_profit=tk3,
+        stop_loss=round(stop_loss, ocr),
+        take_profit=round(tk3, ocr),
         order_link_id=limit_link_id1_ignat,
         time_in_force="GoodTillCancel",
         reduce_only=False,
@@ -368,10 +372,10 @@ def order_ignat_1(symbol, side, stop_loss, count_l, qty_m_ignat, qty_2_ignat, qt
         symbol=symbol,
         side=side,
         order_type="Limit",
-        price=st_two,
+        price=round(st_two, ocr),
         qty=round(qty_3_ignat, 3),
-        stop_loss=stop_loss,
-        take_profit=tk3,
+        stop_loss=round(stop_loss, ocr),
+        take_profit=round(tk3, ocr),
         order_link_id=limit_link_id2_ignat,
         time_in_force="GoodTillCancel",
         reduce_only=False,
@@ -381,6 +385,13 @@ def order_ignat_1(symbol, side, stop_loss, count_l, qty_m_ignat, qty_2_ignat, qt
 
 
 def order_maks_1(symbol, side, stop_loss, count_l, qty_m_maks, qty_2_maks, qty_3_maks, st_one,  st_two, tk3):
+
+    a = session_unauth.query_symbol()['result']
+
+    for v in a:
+        if v['name'] == symbol:
+            ocr = v['price_scale']
+
     limit_link_id1_maks = generate_random_string(8)
     limit_link_id2_maks = generate_random_string(8)
     #position_idx=2,
@@ -389,8 +400,8 @@ def order_maks_1(symbol, side, stop_loss, count_l, qty_m_maks, qty_2_maks, qty_3
         side=side,
         order_type="Market",
         qty=round(qty_m_maks, 3),
-        stop_loss=stop_loss,
-        take_profit=tk3,
+        stop_loss=round(stop_loss, ocr),
+        take_profit=round(tk3, ocr),
         time_in_force="GoodTillCancel",
         reduce_only=False,
         close_on_trigger=False
@@ -400,10 +411,10 @@ def order_maks_1(symbol, side, stop_loss, count_l, qty_m_maks, qty_2_maks, qty_3
         symbol=symbol,
         side=side,
         order_type="Limit",
-        price=st_one,
+        price=round(st_one, ocr),
         qty=round(qty_2_maks, 3),
-        stop_loss=stop_loss,
-        take_profit=tk3,
+        stop_loss=round(stop_loss, ocr),
+        take_profit=round(tk3, ocr),
         order_link_id=limit_link_id1_maks,
         time_in_force="GoodTillCancel",
         reduce_only=False,
@@ -414,10 +425,10 @@ def order_maks_1(symbol, side, stop_loss, count_l, qty_m_maks, qty_2_maks, qty_3
         symbol=symbol,
         side=side,
         order_type="Limit",
-        price=st_two,
+        price=round(st_two, ocr),
         qty=round(qty_3_maks, 3),
-        stop_loss=stop_loss,
-        take_profit=tk3,
+        stop_loss=round(stop_loss, ocr),
+        take_profit=round(tk3, ocr),
         order_link_id=limit_link_id2_maks,
         time_in_force="GoodTillCancel",
         reduce_only=False,
@@ -426,6 +437,13 @@ def order_maks_1(symbol, side, stop_loss, count_l, qty_m_maks, qty_2_maks, qty_3
     cancel_orders[symbol + 'maks'] = [limit_link_id1_maks, limit_link_id2_maks]
 
 def anti_order(symbol, anti_side, tk1, tk2, tk3, anti_qty_1, anti_qty_2, anti_qty_3, price_m):
+
+    a = session_unauth.query_symbol()['result']
+
+    for v in a:
+        if v['name'] == symbol:
+            ocr = v['price_scale']
+
     order_link_id1 = generate_random_string(8) + '1'
     order_link_id2 = generate_random_string(8) + '2'
     order_link_id3 = generate_random_string(8) + '3'
@@ -435,7 +453,7 @@ def anti_order(symbol, anti_side, tk1, tk2, tk3, anti_qty_1, anti_qty_2, anti_qt
     print(session_auth.place_active_order(
         symbol=symbol,
         side=anti_side,
-        price=tk1,
+        price=round(tk1, ocr),
         order_type="Limit",
         qty=round(anti_qty_1, 3),
         time_in_force="GoodTillCancel",
@@ -448,7 +466,7 @@ def anti_order(symbol, anti_side, tk1, tk2, tk3, anti_qty_1, anti_qty_2, anti_qt
     print(session_auth.place_active_order(
         symbol=symbol,
         side=anti_side,
-        price=tk2,
+        price=round(tk2, ocr),
         order_type="Limit",
         qty=round(anti_qty_2, 3),
         time_in_force="GoodTillCancel",
@@ -461,6 +479,13 @@ def anti_order(symbol, anti_side, tk1, tk2, tk3, anti_qty_1, anti_qty_2, anti_qt
 
 
 def anti_order_ignat(symbol, anti_side, tk1, tk2, tk3, anti_qty_1_ignat, anti_qty_2_ignat, anti_qty_3_ignat, price_m):
+
+    a = session_unauth.query_symbol()['result']
+
+    for v in a:
+        if v['name'] == symbol:
+            ocr = v['price_scale']
+
     order_link_ignat_id1 = generate_random_string(8) + '4'
     order_link_ignat_id2 = generate_random_string(8) + '5'
     order_link_ignat_id3 = generate_random_string(8) + '6'
@@ -468,7 +493,7 @@ def anti_order_ignat(symbol, anti_side, tk1, tk2, tk3, anti_qty_1_ignat, anti_qt
     print(session_auth_2.place_active_order(
         symbol=symbol,
         side=anti_side,
-        price=tk1,
+        price=round(tk1, ocr),
         qty=round(anti_qty_1_ignat, 3),
         order_type="Limit",
         time_in_force="GoodTillCancel",
@@ -482,7 +507,7 @@ def anti_order_ignat(symbol, anti_side, tk1, tk2, tk3, anti_qty_1_ignat, anti_qt
     print(session_auth_2.place_active_order(
         symbol=symbol,
         side=anti_side,
-        price=tk2,
+        price=round(tk2, ocr),
         order_type="Limit",
         qty=round(anti_qty_2_ignat, 3),
         time_in_force="GoodTillCancel",
@@ -496,6 +521,13 @@ def anti_order_ignat(symbol, anti_side, tk1, tk2, tk3, anti_qty_1_ignat, anti_qt
 
 
 def anti_order_maks(symbol, anti_side, tk1, tk2, tk3, anti_qty_1_maks, anti_qty_2_maks, anti_qty_3_maks, price_m):
+
+    a = session_unauth.query_symbol()['result']
+
+    for v in a:
+        if v['name'] == symbol:
+            ocr = v['price_scale']
+
     order_link_maks_id1 = generate_random_string(8) + '4'
     order_link_maks_id2 = generate_random_string(8) + '5'
     order_link_maks_id3 = generate_random_string(8) + '6'
@@ -503,7 +535,7 @@ def anti_order_maks(symbol, anti_side, tk1, tk2, tk3, anti_qty_1_maks, anti_qty_
     print(session_auth_3.place_active_order(
         symbol=symbol,
         side=anti_side,
-        price=tk1,
+        price=round(tk1, ocr),
         qty=round(anti_qty_1_maks, 3),
         order_type="Limit",
         time_in_force="GoodTillCancel",
@@ -517,7 +549,7 @@ def anti_order_maks(symbol, anti_side, tk1, tk2, tk3, anti_qty_1_maks, anti_qty_
     print(session_auth_3.place_active_order(
         symbol=symbol,
         side=anti_side,
-        price=tk2,
+        price=round(tk2, ocr),
         order_type="Limit",
         qty=round(anti_qty_2_maks, 3),
         time_in_force="GoodTillCancel",
